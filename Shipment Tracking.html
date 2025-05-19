@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Tracking | PharmaCold</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .map-container {
+            height: 100vh;
+        }
+        .alert-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-blue-900 text-white flex flex-col">
+        <div class="p-5 border-b border-blue-800">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-snowflake text-2xl text-blue-300"></i>
+                <h1 class="text-xl font-bold">PharmaCold</h1>
+            </div>
+            <p class="text-sm text-blue-300 mt-1">Cold Chain Intelligence</p>
+        </div>
+        <nav class="flex-1 p-4 space-y-2 text-sm">
+            <a href="Supply Chain.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 py-2 px-3 bg-blue-800 rounded">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Shipment Tracking</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                <i class="fas fa-cogs"></i>
+                <span>Equipment</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                <i class="fas fa-file-alt"></i>
+                <span>Compliance</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-blue-800">
+            <a href="#" class="flex items-center space-x-2 text-blue-300 hover:text-white">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Map Content -->
+    <main class="flex-1">
+        <div class="map-container" id="shipmentMap"></div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const map = L.map('shipmentMap').setView([20, 0], 2);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const normalIcon = L.divIcon({
+                html: '<div class="w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow"></div>',
+                className: '',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+
+            const warningIcon = L.divIcon({
+                html: '<div class="w-4 h-4 rounded-full bg-yellow-500 border-2 border-white shadow"></div>',
+                className: '',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+
+            const criticalIcon = L.divIcon({
+                html: '<div class="w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow alert-pulse"></div>',
+                className: '',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+
+            L.marker([40.7128, -74.0060], { icon: criticalIcon }).addTo(map)
+                .bindPopup('<b>Shipment #PHC-4829</b><br>Vaccine (COVID-19)<br>Temp: 9.2°C<br>Status: Critical');
+
+            L.marker([51.5074, -0.1278], { icon: warningIcon }).addTo(map)
+                .bindPopup('<b>Shipment #PHC-5102</b><br>Insulin<br>Temp: 5.1°C<br>Status: Warning');
+
+            L.marker([48.8566, 2.3522], { icon: normalIcon }).addTo(map)
+                .bindPopup('<b>Shipment #PHC-4983</b><br>Biologic<br>Temp: 6.8°C<br>Status: Normal');
+        });
+    </script>
+</body>
+</html>

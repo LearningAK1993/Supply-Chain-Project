@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | PharmaCold</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-blue-900 text-white flex flex-col">
+            <div class="p-5 border-b border-blue-800">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-snowflake text-2xl text-blue-300"></i>
+                    <h1 class="text-xl font-bold">PharmaCold</h1>
+                </div>
+                <p class="text-sm text-blue-300 mt-1">Cold Chain Intelligence</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2 text-sm">
+                <a href="Supply Chain.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                </a>
+                <a href="Shipment Tracking.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                    <i class="fas fa-map-marked-alt"></i><span>Shipment Tracking</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 py-2 px-3 bg-blue-800 rounded">
+                    <i class="fas fa-chart-line"></i><span>Analytics</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-blue-800">
+                <a href="#" class="flex items-center space-x-2 text-blue-300 hover:text-white">
+                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 space-y-8">
+            <h2 class="text-2xl font-bold mb-4">Analytics Dashboard</h2>
+
+            <!-- Temperature Excursion Trends -->
+            <div class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-semibold mb-2">Temperature Excursion Trends</h3>
+                <canvas id="tempTrendChart" height="100"></canvas>
+            </div>
+
+            <!-- Shipment Risk Breakdown -->
+            <div class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-semibold mb-2">Shipment Risk Breakdown</h3>
+                <canvas id="riskBreakdownChart" height="100"></canvas>
+            </div>
+
+            <!-- Predictive Accuracy -->
+            <div class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-semibold mb-2">Predictive Accuracy Over Time</h3>
+                <canvas id="predictiveChart" height="100"></canvas>
+            </div>
+
+            <!-- Product Waste % -->
+            <div class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-semibold mb-2">Product Waste Percentage</h3>
+                <canvas id="wasteChart" height="100"></canvas>
+            </div>
+
+            <!-- On-Time Delivery Performance -->
+            <div class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-semibold mb-2">On-Time Delivery Performance</h3>
+                <canvas id="deliveryChart" height="100"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const tempTrend = new Chart(document.getElementById('tempTrendChart'), {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Excursions',
+                    data: [5, 3, 6, 2],
+                    borderColor: '#ef4444',
+                    fill: false,
+                    tension: 0.3
+                }]
+            }
+        });
+
+        const riskBreakdown = new Chart(document.getElementById('riskBreakdownChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Shipment A', 'Shipment B', 'Shipment C', 'Shipment D'],
+                datasets: [
+                    {
+                        label: 'Temperature',
+                        data: [60, 40, 30, 50],
+                        backgroundColor: '#ef4444'
+                    },
+                    {
+                        label: 'Route',
+                        data: [20, 35, 45, 30],
+                        backgroundColor: '#f59e0b'
+                    },
+                    {
+                        label: 'Equipment',
+                        data: [10, 25, 25, 20],
+                        backgroundColor: '#3b82f6'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: { x: { stacked: true }, y: { stacked: true } }
+            }
+        });
+
+        const predictiveAccuracy = new Chart(document.getElementById('predictiveChart'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+                datasets: [{
+                    label: 'Accuracy %',
+                    data: [78, 85, 88, 92],
+                    borderColor: '#10b981',
+                    fill: true,
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)'
+                }]
+            }
+        });
+
+        const wasteChart = new Chart(document.getElementById('wasteChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Wasted', 'Saved'],
+                datasets: [{
+                    data: [2, 98],
+                    backgroundColor: ['#ef4444', '#10b981']
+                }]
+            }
+        });
+
+        const deliveryChart = new Chart(document.getElementById('deliveryChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+                datasets: [{
+                    label: 'On-Time %',
+                    data: [91, 95, 89, 94],
+                    backgroundColor: '#3b82f6'
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

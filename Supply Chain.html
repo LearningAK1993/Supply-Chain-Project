@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCold | Predictive Cold Chain Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css">
+    <style>
+        .temperature-gradient {
+            background: linear-gradient(to right, #3b82f6, #10b981, #f59e0b, #ef4444);
+        }
+        .risk-gradient {
+            background: linear-gradient(to right, #10b981, #f59e0b, #ef4444);
+        }
+        .map-container {
+            height: 400px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .alert-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .gauge {
+            --rotation: 0deg;
+            transform: rotate(var(--rotation));
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-blue-900 text-white w-64 flex-shrink-0">
+            <div class="p-4 border-b border-blue-800">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-snowflake text-2xl text-blue-300"></i>
+                    <h1 class="text-xl font-bold">PharmaCold</h1>
+                </div>
+                <p class="text-xs text-blue-300 mt-1">Predictive Cold Chain Management</p>
+            </div>
+            <nav class="p-4">
+                <div class="mb-6">
+                    <p class="text-xs uppercase text-blue-400 font-semibold mb-2">Navigation</p>
+                    <a href="#" class="flex items-center space-x-2 py-2 px-3 bg-blue-800 rounded-lg text-white">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="Shipment Tracking.html" class="flex items-center space-x-2 py-2 px-3 hover:bg-blue-800 rounded-lg text-blue-200 hover:text-white mt-1">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Shipment Tracking</span>
+                    </a>
+                    <a href="Analytics.html" class="flex items-center space-x-2 py-2 px-3 hover:bg-blue-800 rounded-lg text-blue-200 hover:text-white mt-1">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="Alerts.html" class="flex items-center space-x-2 py-2 px-3 hover:bg-blue-800 rounded-lg text-blue-200 hover:text-white mt-1">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Alerts</span>
+                        <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">3</span>
+                    </a>
+                </div>
+                <div class="mb-6">
+                    <p class="text-xs uppercase text-blue-400 font-semibold mb-2">Management</p>
+                    <a href="#" class="flex items-center space-x-2 py-2 px-3 hover:bg-blue-800 rounded-lg text-blue-200 hover:text-white mt-1">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Compliance</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-2 py-2 px-3 hover:bg-blue-800 rounded-lg text-blue-200 hover:text-white mt-1">
+                        <i class="fas fa-route"></i>
+                        <span>Route Planning</span>
+                    </a>
+                    <a href="Equipment.html" class="flex items-center space-x-2 py-2 px-3 hover:bg-blue-800 rounded-lg text-blue-200 hover:text-white mt-1">
+                        <i class="fas fa-cogs"></i>
+                        <span>Equipment</span>
+                    </a>
+                </div>
+                <div>
+                    <p class="text-xs uppercase text-blue-400 font-semibold mb-2">Support</p>
+                    <a href="#" class="flex items-center space-x-2 py-2 px-3 hover:bg-blue-800 rounded-lg text-blue-200 hover:text-white mt-1">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help Center</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-2 py-2 px-3 hover:bg-blue-800 rounded-lg text-blue-200 hover:text-white mt-1">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="absolute bottom-0 w-full p-4 border-t border-blue-800">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center">
+                        <i class="fas fa-user text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">Dr. Sarah Chen</p>
+                        <p class="text-xs text-blue-300">Quality Assurance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-500 focus:outline-none lg:hidden">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="text-xl font-semibold">Dashboard Overview</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fas fa-envelope"></i>
+                            <span class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">2</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <span class="hidden md:inline">Dr. Sarah Chen</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-4">
+                <!-- Status Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Active Shipments</p>
+                                <p class="text-2xl font-bold">24</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i class="fas fa-truck text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span>
+                                <span>18 Normal</span>
+                                <span class="ml-2 w-2 h-2 rounded-full bg-yellow-500 mr-1"></span>
+                                <span>4 Warning</span>
+                                <span class="ml-2 w-2 h-2 rounded-full bg-red-500 mr-1"></span>
+                                <span>2 Critical</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Temperature Excursions</p>
+                                <p class="text-2xl font-bold">3</p>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-full">
+                                <i class="fas fa-temperature-high text-red-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span>2 predicted, 1 occurred</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Compliance Status</p>
+                                <p class="text-2xl font-bold">98%</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span>2 documents pending</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Risk Score</p>
+                                <p class="text-2xl font-bold">32</p>
+                            </div>
+                            <div class="relative w-10 h-10">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#e6e6e6"
+                                        stroke-width="3"
+                                        stroke-dasharray="100, 100"
+                                    />
+                                    <path d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#3b82f6"
+                                        stroke-width="3"
+                                        stroke-dasharray="32, 100"
+                                    />
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center text-xs font-bold">32</div>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span>Low risk threshold: 40</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Sections -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Shipment Map -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold">Active Shipments Tracking</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">Live View</button>
+                                <button class="text-xs bg-gray-50 text-gray-600 px-2 py-1 rounded">Predictive</button>
+                            </div>
+                        </div>
+                        <div class="map-container" id="shipmentMap"></div>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <div class="flex items-center text-xs">
+                                <span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span>
+                                <span>Normal</span>
+                            </div>
+                            <div class="flex items-center text-xs">
+                                <span class="w-2 h-2 rounded-full bg-yellow-500 mr-1"></span>
+                                <span>Warning</span>
+                            </div>
+                            <div class="flex items-center text-xs">
+                                <span class="w-2 h-2 rounded-full bg-red-500 mr-1"></span>
+                                <span>Critical</span>
+                            </div>
+                            <div class="flex items-center text-xs">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 mr-1"></span>
+                                <span>Predicted Risk</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Critical Alerts -->
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold">Critical Alerts</h3>
+                            <span class="text-xs text-gray-500">3 new</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="border-l-4 border-red-500 pl-3 py-2 bg-red-50">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="font-medium text-sm">Temperature Excursion</p>
+                                        <p class="text-xs text-gray-600">Shipment #PHC-4829</p>
+                                    </div>
+                                    <span class="text-xs text-red-500 font-medium">HIGH</span>
+                                </div>
+                                <p class="text-xs mt-1">Current temp: 9.2°C (2-8°C required)</p>
+                                <div class="mt-2 flex space-x-2">
+                                    <button class="text-xs bg-red-500 text-white px-2 py-1 rounded">View</button>
+                                    <button class="text-xs bg-white border border-gray-300 text-gray-600 px-2 py-1 rounded">Acknowledge</button>
+                                </div>
+                            </div>
+                            <div class="border-l-4 border-yellow-500 pl-3 py-2 bg-yellow-50">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="font-medium text-sm">Route Disruption</p>
+                                        <p class="text-xs text-gray-600">Shipment #PHC-5102</p>
+                                    </div>
+                                    <span class="text-xs text-yellow-500 font-medium">MEDIUM</span>
+                                </div>
+                                <p class="text-xs mt-1">Border delay predicted (85% probability)</p>
+                                <div class="mt-2 flex space-x-2">
+                                    <button class="text-xs bg-yellow-500 text-white px-2 py-1 rounded">View</button>
+                                    <button class="text-xs bg-white border border-gray-300 text-gray-600 px-2 py-1 rounded">Acknowledge</button>
+                                </div>
+                            </div>
+                            <div class="border-l-4 border-blue-500 pl-3 py-2 bg-blue-50">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="font-medium text-sm">Equipment Warning</p>
+                                        <p class="text-xs text-gray-600">Container #CT-7821</p>
+                                    </div>
+                                    <span class="text-xs text-blue-500 font-medium">LOW</span>
+                                </div>
+                                <p class="text-xs mt-1">Battery at 23% - 8 hours remaining</p>
+                                <div class="mt-2 flex space-x-2">
+                                    <button class="text-xs bg-blue-500 text-white px-2 py-1 rounded">View</button>
+                                    <button class="text-xs bg-white border border-gray-300 text-gray-600 px-2 py-1 rounded">Acknowledge</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full mt-3 text-xs text-blue-600 font-medium flex items-center justify-center">
+                            <span>View All Alerts</span>
+                            <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Temperature Monitoring -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold">Temperature Monitoring</h3>
+                            <select class="text-xs border border-gray-300 rounded px-2 py-1">
+                                <option>Last 24 hours</option>
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                            </select>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="temperatureChart"></canvas>
+                        </div>
+                        <div class="mt-4 flex items-center justify-between text-xs">
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-sm bg-blue-500 mr-1"></span>
+                                <span>Current Temp</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-sm bg-green-500 mr-1"></span>
+                                <span>Target Range</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-sm bg-red-500 mr-1"></span>
+                                <span>Predicted Temp</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Prediction -->
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold">Risk Prediction Analysis</h3>
+                            <select class="text-xs border border-gray-300 rounded px-2 py-1">
+                                <option>High Risk Shipments</option>
+                                <option>All Shipments</option>
+                                <option>By Product Type</option>
+                            </select>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+                        <div class="mt-4 flex items-center justify-between text-xs">
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-sm bg-red-500 mr-1"></span>
+                                <span>Temperature Risk</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-sm bg-yellow-500 mr-1"></span>
+                                <span>Route Risk</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-sm bg-blue-500 mr-1"></span>
+                                <span>Equipment Risk</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Shipments -->
+                <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                    <div class="p-4 border-b">
+                        <h3 class="font-semibold">Recent Shipments</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shipment ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Temp</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk Score</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ETA</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#PHC-4829</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Vaccine (COVID-19)</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <span class="text-red-600 font-medium">9.2°C</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Critical</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-red-600 h-2 rounded-full" style="width: 78%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 24, 2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-900">View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#PHC-5102</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Insulin</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <span class="text-green-600 font-medium">5.1°C</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Warning</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 45%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 26, 2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-900">View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#PHC-4983</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Biologic</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <span class="text-green-600 font-medium">6.8°C</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Normal</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-green-500 h-2 rounded-full" style="width: 22%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 28, 2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-900">View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#PHC-5127</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Vaccine (Influenza)</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <span class="text-green-600 font-medium">4.5°C</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Predicted Risk</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-blue-500 h-2 rounded-full" style="width: 65%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 30, 2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-900">View</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-3 border-t flex items-center justify-between">
+                        <div class="text-sm text-gray-500">Showing 4 of 24 shipments</div>
+                        <div class="flex space-x-1">
+                            <button class="px-3 py-1 border rounded text-sm">Previous</button>
+                            <button class="px-3 py-1 border rounded bg-blue-500 text-white text-sm">1</button>
+                            <button class="px-3 py-1 border rounded text-sm">2</button>
+                            <button class="px-3 py-1 border rounded text-sm">3</button>
+                            <button class="px-3 py-1 border rounded text-sm">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compliance & KPIs -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold">Compliance Status</h3>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">98% Complete</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span class="text-sm">GDP Training</span>
+                                </div>
+                                <span class="text-xs text-gray-500">Completed</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span class="text-sm">Temperature Logs</span>
+                                </div>
+                                <span class="text-xs text-gray-500">Completed</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-circle text-yellow-500 mr-2"></i>
+                                    <span class="text-sm">Validation Report</span>
+                                </div>
+                                <span class="text-xs text-gray-500">Due in 3 days</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-circle text-yellow-500 mr-2"></i>
+                                    <span class="text-sm">Audit Trail</span>
+                                </div>
+                                <span class="text-xs text-gray-500">Due in 7 days</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-4 text-sm bg-blue-600 text-white py-2 rounded-lg">Generate Compliance Report</button>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold">Key Performance Indicators</h3>
+                            <select class="text-xs border border-gray-300 rounded px-2 py-1">
+                                <option>Last Quarter</option>
+                                <option>Last Month</option>
+                                <option>Last Week</option>
+                            </select>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm">On-time Deliveries</span>
+                                    <span class="text-sm font-medium">94%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 94%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm">Temperature Excursions</span>
+                                    <span class="text-sm font-medium">2.3%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 2.3%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm">Predictive Accuracy</span>
+                                    <span class="text-sm font-medium">87%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 87%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm">Product Waste</span>
+                                    <span class="text-sm font-medium">0.8%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 0.8%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold">Equipment Health</h3>
+                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">12 Active</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="bg-green-50 p-2 rounded text-center">
+                                <p class="text-2xl font-bold text-green-600">8</p>
+                                <p class="text-xs text-green-800">Good</p>
+                            </div>
+                            <div class="bg-yellow-50 p-2 rounded text-center">
+                                <p class="text-2xl font-bold text-yellow-600">3</p>
+                                <p class="text-xs text-yellow-800">Warning</p>
+                            </div>
+                            <div class="bg-red-50 p-2 rounded text-center">
+                                <p class="text-2xl font-bold text-red-600">1</p>
+                                <p class="text-xs text-red-800">Critical</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-snowflake text-blue-500 mr-2"></i>
+                                    <span class="text-sm">Refrigerator #RF-7821</span>
+                                </div>
+                                <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Battery 23%</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-temperature-low text-blue-500 mr-2"></i>
+                                    <span class="text-sm">Thermal Blanket #TB-4592</span>
+                                </div>
+                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Needs Calibration</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-boxes text-blue-500 mr-2"></i>
+                                    <span class="text-sm">Container #CT-3287</span>
+                                </div>
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Optimal</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-4 text-sm bg-white border border-blue-600 text-blue-600 py-2 rounded-lg">View All Equipment</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Leaflet map
+        document.addEventListener('DOMContentLoaded', function() {
+            // Map initialization
+            const map = L.map('shipmentMap').setView([20, 0], 2);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add sample shipment markers
+            const normalIcon = L.divIcon({
+                html: '<div class="w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow"></div>',
+                className: '',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            
+            const warningIcon = L.divIcon({
+                html: '<div class="w-4 h-4 rounded-full bg-yellow-500 border-2 border-white shadow"></div>',
+                className: '',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            
+            const criticalIcon = L.divIcon({
+                html: '<div class="w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow alert-pulse"></div>',
+                className: '',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            
+            const predictedIcon = L.divIcon({
+                html: '<div class="w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow"></div>',
+                className: '',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            
+            // Sample shipment locations
+            L.marker([40.7128, -74.0060], {icon: criticalIcon}).addTo(map)
+                .bindPopup('<b>Shipment #PHC-4829</b><br>Vaccine (COVID-19)<br>Current Temp: 9.2°C<br>Status: Critical');
+            
+            L.marker([51.5074, -0.1278], {icon: warningIcon}).addTo(map)
+                .bindPopup('<b>Shipment #PHC-5102</b><br>Insulin<br>Current Temp: 5.1°C<br>Status: Warning');
+            
+            L.marker([48.8566, 2.3522], {icon: normalIcon}).addTo(map)
+                .bindPopup('<b>Shipment #PHC-4983</b><br>Biologic<br>Current Temp: 6.8°C<br>Status: Normal');
+            
+            L.marker([35.6762, 139.6503], {icon: predictedIcon}).addTo(map)
+                .bindPopup('<b>Shipment #PHC-5127</b><br>Vaccine (Influenza)<br>Current Temp: 4.5°C<br>Status: Predicted Risk');
+            
+            // Temperature Chart
+            const tempCtx = document.getElementById('temperatureChart').getContext('2d');
+            const tempChart = new Chart(tempCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', 'Now'],
+                    datasets: [
+                        {
+                            label: 'Current Temp',
+                            data: [5.2, 5.0, 4.8, 5.1, 5.5, 6.2, 7.0, 7.8, 9.2],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Target Range',
+                            data: [2, 2, 2, 2, 2, 2, 2, 2, 2],
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            fill: false
+                        },
+                        {
+                            label: 'Target Range',
+                            data: [8, 8, 8, 8, 8, 8, 8, 8, 8],
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            fill: '+1'
+                        },
+                        {
+                            label: 'Predicted Temp',
+                            data: [null, null, null, null, null, null, null, 7.8, 9.2, 10.1, 11.3],
+                            borderColor: '#ef4444',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 12,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '°C';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '°C';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Risk Chart
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+            const riskChart = new Chart(riskCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['PHC-4829', 'PHC-5102', 'PHC-4983', 'PHC-5127'],
+                    datasets: [
+                        {
+                            label: 'Temperature Risk',
+                            data: [78, 30, 15, 45],
+                            backgroundColor: '#ef4444',
+                            borderRadius: 3
+                        },
+                        {
+                            label: 'Route Risk',
+                            data: [45, 65, 20, 30],
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 3
+                        },
+                        {
+                            label: 'Equipment Risk',
+                            data: [30, 40, 10, 50],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

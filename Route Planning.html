@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Route Planning | PharmaCold</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    #routeMap {
+      height: 400px;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-blue-900 text-white flex flex-col">
+      <div class="p-5 border-b border-blue-800">
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-snowflake text-2xl text-blue-300"></i>
+          <h1 class="text-xl font-bold">PharmaCold</h1>
+        </div>
+        <p class="text-sm text-blue-300 mt-1">Cold Chain Intelligence</p>
+      </div>
+      <nav class="flex-1 p-4 space-y-2 text-sm">
+        <a href="Supply Chain.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+          <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+        </a>
+        <a href="Shipment Tracking.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+          <i class="fas fa-map-marked-alt"></i><span>Shipment Tracking</span>
+        </a>
+        <a href="analytics.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+          <i class="fas fa-chart-line"></i><span>Analytics</span>
+        </a>
+        <a href="equipment.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+          <i class="fas fa-cogs"></i><span>Equipment</span>
+        </a>
+        <a href="#" class="flex items-center space-x-3 py-2 px-3 bg-blue-800 rounded">
+          <i class="fas fa-route"></i><span>Route Planning</span>
+        </a>
+      </nav>
+      <div class="p-4 border-t border-blue-800">
+        <a href="#" class="flex items-center space-x-2 text-blue-300 hover:text-white">
+          <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <h2 class="text-2xl font-bold mb-6">Route Planning & Optimization</h2>
+
+      <!-- Route Planner Form -->
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-lg font-semibold mb-4">Plan a New Route</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Origin</label>
+            <input type="text" placeholder="e.g., Melbourne Warehouse" class="w-full px-4 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Destination</label>
+            <input type="text" placeholder="e.g., Sydney Distribution Center" class="w-full px-4 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Expected Departure</label>
+            <input type="datetime-local" class="w-full px-4 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Risk Threshold</label>
+            <select class="w-full px-4 py-2 border rounded">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </select>
+          </div>
+        </div>
+        <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Generate Route</button>
+      </div>
+
+      <!-- Route Map -->
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-lg font-semibold mb-4">Route Map</h3>
+        <div id="routeMap"></div>
+      </div>
+
+      <!-- Route Comparison Table -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Route Options</h3>
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left">Route</th>
+              <th class="px-4 py-2">ETA</th>
+              <th class="px-4 py-2">Temp Stability</th>
+              <th class="px-4 py-2">Risk Score</th>
+              <th class="px-4 py-2">Sustainability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t">
+              <td class="px-4 py-2">Route A</td>
+              <td class="px-4 py-2">10 hrs</td>
+              <td class="px-4 py-2">Stable (96%)</td>
+              <td class="px-4 py-2 text-yellow-600">Medium</td>
+              <td class="px-4 py-2">CO₂: 42kg</td>
+            </tr>
+            <tr class="border-t">
+              <td class="px-4 py-2">Route B</td>
+              <td class="px-4 py-2">8.5 hrs</td>
+              <td class="px-4 py-2 text-red-600">Unstable (65%)</td>
+              <td class="px-4 py-2 text-red-600">High</td>
+              <td class="px-4 py-2">CO₂: 58kg</td>
+            </tr>
+            <tr class="border-t">
+              <td class="px-4 py-2">Route C</td>
+              <td class="px-4 py-2">11 hrs</td>
+              <td class="px-4 py-2 text-green-600">Very Stable (99%)</td>
+              <td class="px-4 py-2 text-green-600">Low</td>
+              <td class="px-4 py-2">CO₂: 39kg</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Leaflet Map Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const map = L.map('routeMap').setView([-33.86, 151.20], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      const origin = L.marker([-37.8136, 144.9631]).addTo(map).bindPopup('Melbourne Warehouse');
+      const destination = L.marker([-33.8688, 151.2093]).addTo(map).bindPopup('Sydney Distribution Center');
+
+      const routeLine = L.polyline([
+        [-37.8136, 144.9631],
+        [-35.2809, 149.1300], // Canberra waypoint
+        [-33.8688, 151.2093]
+      ], { color: 'blue', weight: 4 }).addTo(map);
+
+      map.fitBounds(routeLine.getBounds());
+    });
+  </script>
+</body>
+</html>

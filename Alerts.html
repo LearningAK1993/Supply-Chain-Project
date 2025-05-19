@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alerts | PharmaCold</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-blue-900 text-white flex flex-col">
+      <div class="p-5 border-b border-blue-800">
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-snowflake text-2xl text-blue-300"></i>
+          <h1 class="text-xl font-bold">PharmaCold</h1>
+        </div>
+        <p class="text-sm text-blue-300 mt-1">Cold Chain Intelligence</p>
+      </div>
+      <nav class="flex-1 p-4 space-y-2 text-sm">
+        <a href="Supply Chain.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+          <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+        </a>
+        <a href="Shipment Tracking.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+          <i class="fas fa-map-marked-alt"></i><span>Shipment Tracking</span>
+        </a>
+        <a href="analytics.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+          <i class="fas fa-chart-line"></i><span>Analytics</span>
+        </a>
+        <a href="equipment.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+          <i class="fas fa-cogs"></i><span>Equipment</span>
+        </a>
+        <a href="Alerts.html" class="flex items-center space-x-3 py-2 px-3 bg-blue-800 rounded">
+          <i class="fas fa-exclamation-triangle"></i><span>Alerts</span>
+        </a>
+      </nav>
+      <div class="p-4 border-t border-blue-800">
+        <a href="#" class="flex items-center space-x-2 text-blue-300 hover:text-white">
+          <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <h2 class="text-2xl font-bold mb-6">Real-Time Alerts & Notifications</h2>
+
+      <div class="space-y-4">
+        <!-- Alert Card -->
+        <div class="bg-white border-l-4 border-red-600 p-4 shadow rounded">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold text-red-700">Temperature Excursion</h3>
+            <span class="text-xs text-red-600 font-bold">HIGH</span>
+          </div>
+          <p class="text-sm text-gray-700">Shipment #PHC-4829 exceeded 9.2°C. Safe range is 2°C to 8°C.</p>
+          <p class="text-xs text-gray-500 mt-1">Triggered: 5 mins ago</p>
+          <div class="mt-2 space-x-2">
+            <button class="text-xs bg-red-600 text-white px-3 py-1 rounded">View</button>
+            <button class="text-xs bg-white border border-gray-300 px-3 py-1 rounded">Acknowledge</button>
+          </div>
+        </div>
+
+        <div class="bg-white border-l-4 border-yellow-500 p-4 shadow rounded">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold text-yellow-700">Route Disruption</h3>
+            <span class="text-xs text-yellow-600 font-bold">MEDIUM</span>
+          </div>
+          <p class="text-sm text-gray-700">Border delay expected on Shipment #PHC-5102. ETA may be impacted.</p>
+          <p class="text-xs text-gray-500 mt-1">Predicted: 30 mins ago</p>
+          <div class="mt-2 space-x-2">
+            <button class="text-xs bg-yellow-500 text-white px-3 py-1 rounded">View</button>
+            <button class="text-xs bg-white border border-gray-300 px-3 py-1 rounded">Acknowledge</button>
+          </div>
+        </div>
+
+        <div class="bg-white border-l-4 border-blue-500 p-4 shadow rounded">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold text-blue-700">Low Battery on Equipment</h3>
+            <span class="text-xs text-blue-600 font-bold">LOW</span>
+          </div>
+          <p class="text-sm text-gray-700">Container #CT-3287 battery at 18%. 5 hours remaining.</p>
+          <p class="text-xs text-gray-500 mt-1">Detected: 1 hour ago</p>
+          <div class="mt-2 space-x-2">
+            <button class="text-xs bg-blue-500 text-white px-3 py-1 rounded">View</button>
+            <button class="text-xs bg-white border border-gray-300 px-3 py-1 rounded">Acknowledge</button>
+          </div>
+        </div>
+
+        <div class="bg-white border-l-4 border-indigo-500 p-4 shadow rounded">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold text-indigo-700">Compliance Reminder</h3>
+            <span class="text-xs text-indigo-600 font-bold">NOTICE</span>
+          </div>
+          <p class="text-sm text-gray-700">Validation Report due in 48 hours. Required for WHO GDP audit.</p>
+          <p class="text-xs text-gray-500 mt-1">Generated: Today 8:00 AM</p>
+          <div class="mt-2 space-x-2">
+            <button class="text-xs bg-indigo-500 text-white px-3 py-1 rounded">View</button>
+            <button class="text-xs bg-white border border-gray-300 px-3 py-1 rounded">Mark Complete</button>
+          </div>
+        </div>
+
+        <div class="bg-white border-l-4 border-green-500 p-4 shadow rounded">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold text-green-700">Normal Update</h3>
+            <span class="text-xs text-green-600 font-bold">INFO</span>
+          </div>
+          <p class="text-sm text-gray-700">All shipments delivered on time in the last 24 hours.</p>
+          <p class="text-xs text-gray-500 mt-1">System Update: 6:00 AM</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

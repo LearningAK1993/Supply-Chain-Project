@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Overview | PharmaCold</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-blue-900 text-white flex flex-col">
+            <div class="p-5 border-b border-blue-800">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-snowflake text-2xl text-blue-300"></i>
+                    <h1 class="text-xl font-bold">PharmaCold</h1>
+                </div>
+                <p class="text-sm text-blue-300 mt-1">Cold Chain Intelligence</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2 text-sm">
+                <a href="Supply Chain.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                </a>
+                <a href="Shipment Tracking.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                    <i class="fas fa-map-marked-alt"></i><span>Shipment Tracking</span>
+                </a>
+                <a href="analytics.html" class="flex items-center space-x-3 py-2 px-3 hover:bg-blue-800 rounded">
+                    <i class="fas fa-chart-line"></i><span>Analytics</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 py-2 px-3 bg-blue-800 rounded">
+                    <i class="fas fa-cogs"></i><span>Equipment</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-blue-800">
+                <a href="#" class="flex items-center space-x-2 text-blue-300 hover:text-white">
+                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <h2 class="text-2xl font-bold mb-6">Cold Chain Equipment Overview</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <!-- Equipment Card -->
+                <div class="bg-white rounded-lg shadow p-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold">Refrigerator #RF-7821</h3>
+                        <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Critical</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">Purpose: Storage of temperature-sensitive vaccines.</p>
+                    <p class="text-sm text-gray-600">Current Temp: <span class="text-red-600 font-bold">9.2°C</span> (Threshold: 2°C - 8°C)</p>
+                    <p class="text-sm text-gray-500 mt-2">Battery: 23% remaining (Approx. 8 hours)</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold">Thermal Blanket #TB-4592</h3>
+                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Warning</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">Purpose: Passive temperature control for long-distance shipment.</p>
+                    <p class="text-sm text-gray-600">Last Calibration: <span class="text-yellow-600">Overdue</span></p>
+                    <p class="text-sm text-gray-500 mt-2">Status: Requires calibration</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold">Smart Container #CT-3287</h3>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Optimal</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">Purpose: Real-time GPS and temperature tracking with cloud sync.</p>
+                    <p class="text-sm text-gray-600">Current Temp: 6.5°C (Stable)</p>
+                    <p class="text-sm text-gray-500 mt-2">Connectivity: Online</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold">Temperature Logger #TL-1120</h3>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Active</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">Purpose: Records and stores temperature data for audit and compliance.</p>
+                    <p class="text-sm text-gray-600">Battery Life: 40 days remaining</p>
+                    <p class="text-sm text-gray-500 mt-2">Last Upload: 3 hours ago</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold">Insulated Pallet Cover #IPC-9902</h3>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Optimal</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">Purpose: Maintains temperature buffer during cross-docking and transits.</p>
+                    <p class="text-sm text-gray-600">Surface Temp: 7.1°C</p>
+                    <p class="text-sm text-gray-500 mt-2">Material: Multi-layer foil + foam</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold">Data Gateway #DG-5098</h3>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Connected</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">Purpose: Aggregates IoT data from all cold chain devices for central analysis.</p>
+                    <p class="text-sm text-gray-600">Uptime: 99.8%</p>
+                    <p class="text-sm text-gray-500 mt-2">Last Sync: 15 minutes ago</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
